@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MySwitch">
+        <attr name="borderRadius" format="dimension"></attr>
+        <attr name="borderWidth" format="dimension"></attr>
+        <attr name="borderColor" format="color"></attr>
+
+
+        <attr name="barRadius" format="dimension"></attr>
+        <attr name="barLineWidth" format="dimension"></attr>
+        <attr name="barLineColor" format="color"></attr>
+        <attr name="barColor" format="color"></attr>
+
+        <attr name="checked" format="boolean"></attr>
+
+        <attr name="checkColor" format="color"></attr>
+        <attr name="unCheckColor" format="color"></attr>
+
+        <attr name="shadowWidth" format="dimension"></attr>
+
+
+        <attr name="useAnimation" format="boolean"></attr>
+        <attr name="duration" format="integer"></attr>
+        <attr name="isReverse" format="boolean"></attr>
+
+
+
+    </declare-styleable>
+</resources>
