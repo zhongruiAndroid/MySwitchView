@@ -13,3 +13,4 @@ gradle.properties
 .svn
 gradlew
 gradlew.bat
+.test/

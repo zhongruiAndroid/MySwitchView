@@ -1,1 +1,1 @@
-include ':app', ':MySwitch'
+include ':app', ':MySwitch', ':.test'

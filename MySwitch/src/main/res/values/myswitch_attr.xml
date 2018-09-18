@@ -6,8 +6,8 @@
 
 
         <attr name="barRadius" format="dimension"></attr>
-        <attr name="barLineWidth" format="dimension"></attr>
-        <attr name="barLineColor" format="color"></attr>
+        <attr name="barBorderWidth" format="dimension"></attr>
+        <attr name="barBorderColor" format="color"></attr>
 
         <attr name="checked" format="boolean"></attr>
 
@@ -27,7 +27,7 @@
 
         <attr name="useAnimation" format="boolean"></attr>
         <attr name="duration" format="integer"></attr>
-        <attr name="isReverse" format="boolean"></attr>
+        <attr name="reverse" format="boolean"></attr>
 
 
 
