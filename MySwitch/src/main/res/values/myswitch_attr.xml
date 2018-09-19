@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MySwitch">
+        <!--边框-->
         <attr name="borderRadius" format="dimension"></attr>
         <attr name="borderWidth" format="dimension"></attr>
-
-
-        <attr name="barRadius" format="dimension"></attr>
-        <attr name="barBorderWidth" format="dimension"></attr>
-        <attr name="barBorderColor" format="color"></attr>
-
-        <attr name="checked" format="boolean"></attr>
-
-        <attr name="checkColor" format="color"></attr>
-        <attr name="checkBarColor" format="color"></attr>
         <attr name="checkBorderColor" format="color"></attr>
-
-
-
-        <attr name="unCheckColor" format="color"></attr>
         <attr name="unCheckBorderColor" format="color"></attr>
-        <attr name="unCheckBarColor" format="color"></attr>
 
+        <!--滑块-->
+        <attr name="barRadius" format="dimension"></attr>
+        <attr name="checkBarColor" format="color"></attr>
+        <attr name="unCheckBarColor" format="color"></attr>
         <attr name="barShadowWidth" format="dimension"></attr>
         <attr name="barShadowColor" format="color"></attr>
         <attr name="useBarShadow" format="boolean"></attr>
+
+        <!--滑块边框-->
+        <attr name="barBorderWidth" format="dimension"></attr>
+        <attr name="barBorderColor" format="color"></attr>
+
+        <!--view-->
+        <attr name="checkColor" format="color"></attr>
+        <attr name="unCheckColor" format="color"></attr>
+
+
+
 
         <attr name="useAnimation" format="boolean"></attr>
         <attr name="duration" format="integer"></attr>
         <attr name="reverse" format="boolean"></attr>
 
+        <attr name="enabled" format="boolean"></attr>
+
+        <attr name="checked" format="boolean"></attr>
 
 
     </declare-styleable>
