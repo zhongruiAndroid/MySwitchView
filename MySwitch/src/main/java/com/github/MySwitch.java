@@ -1,4 +1,4 @@
-package com.github.myswitch;
+package com.github;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -14,7 +14,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.Checkable;
+
+import com.github.myswitch.R;
 
 import static android.graphics.Path.Op.DIFFERENCE;
 
@@ -213,10 +216,28 @@ public class MySwitch extends View implements Checkable{
         setLayerType(LAYER_TYPE_SOFTWARE,null);
     }
 
-
+    private int dip2px(Context context, float dipValue) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int)(dipValue * scale + 0.5F);
+    }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width=dip2px(getContext(),55);
+        int height=dip2px(getContext(),30);
+
+        if(ViewGroup.LayoutParams.WRAP_CONTENT==getLayoutParams().width&&ViewGroup.LayoutParams.WRAP_CONTENT==getLayoutParams().height){
+            setMeasuredDimension(width,height);
+        }else if(ViewGroup.LayoutParams.WRAP_CONTENT==getLayoutParams().width){
+            setMeasuredDimension(width,sizeHeight);
+        }else if(ViewGroup.LayoutParams.WRAP_CONTENT==getLayoutParams().height){
+            setMeasuredDimension(sizeWidth,height);
+        }else{
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
     }
 
     @Override
