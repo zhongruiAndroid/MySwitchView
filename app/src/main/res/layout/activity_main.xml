@@ -5,11 +5,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
+    tools:context=".MainActivity"
+    android:gravity="center"
+    >
     <com.github.MySwitch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
+        app:borderRadius="20dp"
+        app:borderWidth="5px"
+        app:checkBorderColor="#B014BD28"
+        app:unCheckBorderColor="#FFD7DADD"
+        app:barRadius="20dp"
+        app:checkBarColor="@android:color/white"
+        app:unCheckBarColor="@android:color/white"
+        app:barShadowWidth="4px"
+        app:barShadowColor="#eeeeee"
+        app:useBarShadow="true"
+        app:barBorderWidth="2px"
+        app:barBorderColor="#eeeeee"
+        app:checkColor="#B014BD28"
+        app:unCheckColor="@android:color/white"
+        app:useAnimation="true"
+        app:duration="230"
+        app:reverse="false"
+        app:enabled="true"
+        app:canMove="true"
+        app:checked="true"
         />
-
 </LinearLayout>
