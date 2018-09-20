@@ -23,7 +23,7 @@ public class MySwitch extends View implements Checkable{
     private OnSwitchChangeListener onSwitchChangeListener;
 
     public interface OnSwitchClickListener{
-        boolean onSwitchClick();
+        boolean onSwitchClick(boolean isEnabled,View mySwitch);
     }
     public interface OnSwitchChangeListener{
         void onSwitchChange(boolean isChecked,View mySwitch);
@@ -166,21 +166,21 @@ public class MySwitch extends View implements Checkable{
         if(attrs!=null){
             TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.MySwitch);
             /*--边框--*/
-            borderRadius=typedArray.getFloat(R.styleable.MySwitch_borderRadius,borderRadius);
-            borderWidth=typedArray.getInt(R.styleable.MySwitch_borderWidth,borderWidth);
+            borderRadius=typedArray.getDimension(R.styleable.MySwitch_borderRadius,borderRadius);
+            borderWidth= (int) typedArray.getDimension(R.styleable.MySwitch_borderWidth,borderWidth);
             checkBorderColor=typedArray.getColor(R.styleable.MySwitch_checkBorderColor,checkBorderColor);
             unCheckBorderColor=typedArray.getColor(R.styleable.MySwitch_unCheckBorderColor,unCheckBorderColor);
 
             /*--滑块--*/
-            barRadius=typedArray.getFloat(R.styleable.MySwitch_barRadius,barRadius);
+            barRadius=typedArray.getDimension(R.styleable.MySwitch_barRadius,barRadius);
             checkBarColor=typedArray.getColor(R.styleable.MySwitch_checkBarColor,checkBarColor);
             unCheckBarColor=typedArray.getColor(R.styleable.MySwitch_unCheckBarColor,unCheckBarColor);
-            barShadowWidth=typedArray.getInt(R.styleable.MySwitch_barShadowWidth,barShadowWidth);
+            barShadowWidth= (int) typedArray.getDimension(R.styleable.MySwitch_barShadowWidth,barShadowWidth);
             barShadowColor=typedArray.getColor(R.styleable.MySwitch_barShadowColor,barShadowColor);
             useBarShadow=typedArray.getBoolean(R.styleable.MySwitch_useBarShadow,useBarShadow);
 
             /*--滑块边框--*/
-            barBorderWidth=typedArray.getInt(R.styleable.MySwitch_barBorderWidth,barBorderWidth);
+            barBorderWidth= (int) typedArray.getDimension(R.styleable.MySwitch_barBorderWidth,barBorderWidth);
             barBorderColor=typedArray.getColor(R.styleable.MySwitch_barBorderColor,barBorderColor);
 
             /*--view--*/
@@ -259,10 +259,10 @@ public class MySwitch extends View implements Checkable{
         gestureDetector=new GestureDetector(getContext(),new GestureDetector.SimpleOnGestureListener(){
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick()==true){
+                if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick(isEnabled(),MySwitch.this)==true){
 
                 }else{
-                    if(enabled){
+                    if(isEnabled()){
                         toggle();
                     }
                 }
@@ -427,14 +427,6 @@ public class MySwitch extends View implements Checkable{
                                 canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
 
 
-                        /*barLeft=getWidth()-getHeight()+borderWidth;
-            barTop=borderWidth;
-            barRight=getWidth()-borderWidth;
-            barBottom=getHeight()-borderWidth;
-barLeft=borderWidth;
-            barTop=borderWidth;
-            barRight=getHeight()-borderWidth;
-            barBottom=getHeight()-borderWidth;*/
                                 float barHeight=getHeight()-borderWidth * 2f;
                                 float moveLength = getWidth() -barHeight-borderWidth*2f;
                                 float left=borderWidth+moveLength*value;
@@ -456,7 +448,6 @@ barLeft=borderWidth;
                                 float bottom=getHeight()-borderWidth;
                                 barRectF=new RectF(left,top,right,bottom);
                             }
-//                            Log.i("@====","===" +barRectF.left);
                             initPath();
                             invalidate();
                         }
