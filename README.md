@@ -2,6 +2,8 @@
 
 
 ![github](https://github.com/zhongruiAndroid/MySwitchView/blob/master/app/src/main/res/drawable/switchview.gif "github")
+
+## [Demo.apk下载](https://raw.githubusercontent.com/zhongruiAndroid/MySwitchView/master/app/release/demo.apk "apk文件")
   
   
 | 属性               | 类型      | 说明                                                     |
