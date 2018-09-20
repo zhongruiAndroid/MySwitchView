@@ -1,7 +1,7 @@
 # MySwitchView
 
 
-![github](https://github.com/zhongruiAndroid/MySwitchView/blob/master/app/src/main/res/drawable/switch.gif "github")  
+![github](https://github.com/zhongruiAndroid/MySwitchView/blob/master/app/src/main/res/drawable/switchview.gif "github")
   
   
 | 属性               | 类型      | 说明                                                     |
