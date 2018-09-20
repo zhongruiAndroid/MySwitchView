@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -126,6 +127,7 @@ public class MySwitch extends View implements Checkable{
 
 
     private boolean sizeChanged;
+    private boolean canMove;
 
     public MySwitch(Context context) {
         super(context);
@@ -268,6 +270,47 @@ public class MySwitch extends View implements Checkable{
                 }
                 return true;
             }
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                if(isEnabled()&&canMove){
+                    if(valueAnimator!=null&&valueAnimator.isRunning()){
+                        valueAnimator.cancel();
+                    }
+                    if(reverse){
+                        distanceX=distanceX*-1;
+                    }
+                    //从右往左移动
+                    if(distanceX>0){
+                        if (barRectF.left-borderWidth<distanceX) {
+                            distanceX=barRectF.left-borderWidth;
+                        }
+                        barRectF.left=barRectF.left-distanceX;
+                        barRectF.right=barRectF.right-distanceX;
+                    }else{
+                        if (barRectF.right+borderWidth+Math.abs(distanceX)>getWidth()) {
+                            distanceX=getWidth()-barRectF.right-borderWidth;
+                        }
+                        barRectF.left=barRectF.left+Math.abs(distanceX);
+                        barRectF.right=barRectF.right+Math.abs(distanceX);
+                    }
+                    float barHeight=getHeight()-borderWidth * 2f;
+                    float moveLength = getWidth() -barHeight-borderWidth*2f;
+                    if(!isChecked()){
+                        float value = (barRectF.left-borderWidth)*1f / moveLength;
+                        canvasColor= (int) argbEvaluator.evaluate(value,unCheckColor,checkColor);
+                        canvasBarColor= (int) argbEvaluator.evaluate(value,unCheckBarColor,checkBarColor);
+                        canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
+                    }else{
+                        float value = (getWidth()-barRectF.right-borderWidth)*1f / moveLength;
+                        canvasColor= (int) argbEvaluator.evaluate(value,checkColor,unCheckColor);
+                        canvasBarColor= (int) argbEvaluator.evaluate(value,checkBarColor,unCheckBarColor);
+                        canvasBorderColor= (int) argbEvaluator.evaluate(value,checkBorderColor,unCheckBorderColor);
+                    }
+                    initPath();
+                    invalidate();
+                }
+                return true;
+            }
         });
     }
 
@@ -361,7 +404,49 @@ public class MySwitch extends View implements Checkable{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetector.onTouchEvent(event);
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                if(isEnabled()==false){
+                    canMove=false;
+                }else{
+                    if(reverse){
+                        Matrix matrix=new Matrix();
+                        matrix.postRotate(180,getWidth()/2,getHeight()/2);
+                        RectF rectF=new RectF();
+                        rectF.set(barRectF);
+                        matrix.mapRect(rectF);
+
+                        canMove=rectF.contains(event.getX(),event.getY());
+                    }else{
+                        canMove=barRectF.contains(event.getX(),event.getY());
+                    }
+                }
+
+            break;
+            case MotionEvent.ACTION_UP:
+                if(isEnabled()&&canMove){
+                    rectReset();
+                }
+                canMove=false;
+                break;
+        }
         return true;
+    }
+
+    //手动滑动滑块，ACTION_UP之后复位
+    private void rectReset() {
+        float barHeight=getHeight()-borderWidth * 2f;
+        float moveLength = getWidth() -barHeight-borderWidth*2f;
+        float value = (barRectF.left-borderWidth)*1f / moveLength;
+        if(value<=0.5f){
+            //复位
+            prepareAnimator(value,0);
+        }else{
+            checked=!checked;
+            prepareAnimator(value,1);
+        }
+        valueAnimator.setDuration((long) (duration*value));
+        valueAnimator.start();
     }
 
     @Override
@@ -416,45 +501,9 @@ public class MySwitch extends View implements Checkable{
             public void run() {
                 if(useAnimation){
                     //更新动画
-                    valueAnimator=ValueAnimator.ofFloat(0,1);
-                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            float value = (float) animation.getAnimatedValue();
-                            if(checked){
-                                canvasColor= (int) argbEvaluator.evaluate(value,unCheckColor,checkColor);
-                                canvasBarColor= (int) argbEvaluator.evaluate(value,unCheckBarColor,checkBarColor);
-                                canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
-
-
-                                float barHeight=getHeight()-borderWidth * 2f;
-                                float moveLength = getWidth() -barHeight-borderWidth*2f;
-                                float left=borderWidth+moveLength*value;
-                                float right=left+barHeight;
-                                float top=borderWidth;
-                                float bottom=getHeight()-borderWidth;
-                                barRectF=new RectF(left,top,right,bottom);
-
-                            }else{
-                                canvasColor= (int) argbEvaluator.evaluate(value,checkColor,unCheckColor);
-                                canvasBarColor= (int) argbEvaluator.evaluate(value,checkBarColor,unCheckBarColor);
-                                canvasBorderColor= (int) argbEvaluator.evaluate(value,checkBorderColor,unCheckBorderColor);
-
-                                float barHeight=getHeight()-borderWidth * 2f;
-                                float moveLength = getWidth() -barHeight-borderWidth*2f;
-                                float right=getWidth()-borderWidth-moveLength*value;
-                                float left=right-barHeight;
-                                float top=borderWidth;
-                                float bottom=getHeight()-borderWidth;
-                                barRectF=new RectF(left,top,right,bottom);
-                            }
-                            initPath();
-                            invalidate();
-                        }
-                    });
+                    prepareAnimator(0,1);
                     valueAnimator.setDuration(duration);
                     valueAnimator.start();
-
                 }else{
                     if(checked){
                         canvasColor= checkColor;
@@ -469,6 +518,45 @@ public class MySwitch extends View implements Checkable{
                     initPath();
                     invalidate();
                 }
+            }
+        });
+    }
+
+    private void prepareAnimator(float start, float end) {
+        valueAnimator=ValueAnimator.ofFloat(start,end);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                if(checked){
+                    canvasColor= (int) argbEvaluator.evaluate(value,unCheckColor,checkColor);
+                    canvasBarColor= (int) argbEvaluator.evaluate(value,unCheckBarColor,checkBarColor);
+                    canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
+
+
+                    float barHeight=getHeight()-borderWidth * 2f;
+                    float moveLength = getWidth() -barHeight-borderWidth*2f;
+                    float left=borderWidth+moveLength*value;
+                    float right=left+barHeight;
+                    float top=borderWidth;
+                    float bottom=getHeight()-borderWidth;
+                    barRectF=new RectF(left,top,right,bottom);
+
+                }else{
+                    canvasColor= (int) argbEvaluator.evaluate(value,checkColor,unCheckColor);
+                    canvasBarColor= (int) argbEvaluator.evaluate(value,checkBarColor,unCheckBarColor);
+                    canvasBorderColor= (int) argbEvaluator.evaluate(value,checkBorderColor,unCheckBorderColor);
+
+                    float barHeight=getHeight()-borderWidth * 2f;
+                    float moveLength = getWidth() -barHeight-borderWidth*2f;
+                    float right=getWidth()-borderWidth-moveLength*value;
+                    float left=right-barHeight;
+                    float top=borderWidth;
+                    float bottom=getHeight()-borderWidth;
+                    barRectF=new RectF(left,top,right,bottom);
+                }
+                initPath();
+                invalidate();
             }
         });
     }
