@@ -107,4 +107,14 @@ ms.setOnSwitchClickListener(new MySwitch.OnSwitchClickListener() {
        return false;
    }
 });
+```  
+  
+  | 最新版本号 | [ ![Download](https://api.bintray.com/packages/zhongrui/mylibrary/MySwitch/images/download.svg) ](https://bintray.com/zhongrui/mylibrary/MySwitch/_latestVersion) |
+|--------|----|
+  
+
+
+
+```gradle
+implementation 'com.github:MySwitch:版本号看上面'
 ```
