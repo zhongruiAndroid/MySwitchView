@@ -14,3 +14,5 @@ gradle.properties
 gradlew
 gradlew.bat
 .test/
+output.json
+!demo.apk
