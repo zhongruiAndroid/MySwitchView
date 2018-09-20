@@ -23,10 +23,10 @@ public class MySwitch extends View implements Checkable{
     private OnSwitchChangeListener onSwitchChangeListener;
 
     public interface OnSwitchClickListener{
-        boolean onSwitchClick(boolean isEnabled,View mySwitch);
+        boolean onSwitchClick(boolean isEnabled,boolean beforeClickChecked);
     }
     public interface OnSwitchChangeListener{
-        void onSwitchChange(boolean isChecked,View mySwitch);
+        void onSwitchChange(boolean isChecked,MySwitch mySwitch);
     }
 
     public OnSwitchClickListener getOnSwitchClickListener() {
@@ -112,7 +112,7 @@ public class MySwitch extends View implements Checkable{
     //动画执行时间
     private int duration=230;
     //是否反向
-    private boolean reverse=true;
+    private boolean reverse=false;
 
     //是否可以点击
     private boolean enabled=true;
@@ -345,7 +345,6 @@ public class MySwitch extends View implements Checkable{
     }
     private float firstDownX;
     private float tempX;
-    private boolean isClick;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 //        gestureDetector.onTouchEvent(event);
@@ -358,7 +357,7 @@ public class MySwitch extends View implements Checkable{
                 if(isEnabled()){
                     //点击
                     if(Math.abs(firstDownX-event.getX())<= ViewConfiguration.get(getContext()).getScaledTouchSlop()){
-                        if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick(isEnabled(),MySwitch.this)==true){
+                        if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick(isEnabled(),isChecked())==true){
 
                         }else{
                             toggle();
@@ -469,7 +468,6 @@ public class MySwitch extends View implements Checkable{
 
 
         /*view主体背景*/
-        //如果选中状态，主体颜色和边框颜色一样，则不绘制主体颜色，防止颜色重叠加深
         checkColorPaint.setColor(canvasColor);
         canvas.drawPath(checkColorPath,checkColorPaint);
 
