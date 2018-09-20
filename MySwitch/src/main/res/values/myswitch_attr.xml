@@ -31,6 +31,7 @@
         <attr name="reverse" format="boolean"></attr>
 
         <attr name="enabled" format="boolean"></attr>
+        <attr name="canMove" format="boolean"></attr>
 
         <attr name="checked" format="boolean"></attr>
 

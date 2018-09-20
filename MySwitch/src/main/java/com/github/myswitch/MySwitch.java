@@ -6,15 +6,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.Checkable;
 
 import static android.graphics.Path.Op.DIFFERENCE;
@@ -117,17 +116,17 @@ public class MySwitch extends View implements Checkable{
 
     //是否可以点击
     private boolean enabled=true;
+    //是否可以滑动滑块
+    private boolean canMove=true;
 
 
     private ArgbEvaluator argbEvaluator;
 
 
-    private GestureDetector gestureDetector;
     private ValueAnimator valueAnimator;
 
 
-    private boolean sizeChanged;
-    private boolean canMove;
+//    private boolean sizeChanged;
 
     public MySwitch(Context context) {
         super(context);
@@ -194,6 +193,7 @@ public class MySwitch extends View implements Checkable{
             duration=typedArray.getInt(R.styleable.MySwitch_duration,duration);
             reverse=typedArray.getBoolean(R.styleable.MySwitch_reverse,reverse);
             enabled=typedArray.getBoolean(R.styleable.MySwitch_enabled,enabled);
+            canMove=typedArray.getBoolean(R.styleable.MySwitch_canMove,canMove);
             checked=typedArray.getBoolean(R.styleable.MySwitch_checked,checked);
 
             typedArray.recycle();
@@ -222,7 +222,6 @@ public class MySwitch extends View implements Checkable{
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        initGestureDetector();
         centerX=w/2;
         centerY=h/2;
 
@@ -254,65 +253,9 @@ public class MySwitch extends View implements Checkable{
 
         initRectF();
         initPath();
-        sizeChanged=true;
+//        sizeChanged=true;
     }
 
-    private void initGestureDetector() {
-        gestureDetector=new GestureDetector(getContext(),new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick(isEnabled(),MySwitch.this)==true){
-
-                }else{
-                    if(isEnabled()){
-                        toggle();
-                    }
-                }
-                return true;
-            }
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                if(isEnabled()&&canMove){
-                    if(valueAnimator!=null&&valueAnimator.isRunning()){
-                        valueAnimator.cancel();
-                    }
-                    if(reverse){
-                        distanceX=distanceX*-1;
-                    }
-                    //从右往左移动
-                    if(distanceX>0){
-                        if (barRectF.left-borderWidth<distanceX) {
-                            distanceX=barRectF.left-borderWidth;
-                        }
-                        barRectF.left=barRectF.left-distanceX;
-                        barRectF.right=barRectF.right-distanceX;
-                    }else{
-                        if (barRectF.right+borderWidth+Math.abs(distanceX)>getWidth()) {
-                            distanceX=getWidth()-barRectF.right-borderWidth;
-                        }
-                        barRectF.left=barRectF.left+Math.abs(distanceX);
-                        barRectF.right=barRectF.right+Math.abs(distanceX);
-                    }
-                    float barHeight=getHeight()-borderWidth * 2f;
-                    float moveLength = getWidth() -barHeight-borderWidth*2f;
-                    if(!isChecked()){
-                        float value = (barRectF.left-borderWidth)*1f / moveLength;
-                        canvasColor= (int) argbEvaluator.evaluate(value,unCheckColor,checkColor);
-                        canvasBarColor= (int) argbEvaluator.evaluate(value,unCheckBarColor,checkBarColor);
-                        canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
-                    }else{
-                        float value = (getWidth()-barRectF.right-borderWidth)*1f / moveLength;
-                        canvasColor= (int) argbEvaluator.evaluate(value,checkColor,unCheckColor);
-                        canvasBarColor= (int) argbEvaluator.evaluate(value,checkBarColor,unCheckBarColor);
-                        canvasBorderColor= (int) argbEvaluator.evaluate(value,checkBorderColor,unCheckBorderColor);
-                    }
-                    initPath();
-                    invalidate();
-                }
-                return true;
-            }
-        });
-    }
 
     /***
      * set方法需要initRect，但是执行动画的时候只需要initPath，不需要initRect
@@ -400,51 +343,113 @@ public class MySwitch extends View implements Checkable{
 
         borderPath.op(checkColorPath,DIFFERENCE);
     }
-
+    private float firstDownX;
+    private float tempX;
+    private boolean isClick;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
+//        gestureDetector.onTouchEvent(event);
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                if(isEnabled()==false){
-                    canMove=false;
-                }else{
-                    if(reverse){
-                        Matrix matrix=new Matrix();
-                        matrix.postRotate(180,getWidth()/2,getHeight()/2);
-                        RectF rectF=new RectF();
-                        rectF.set(barRectF);
-                        matrix.mapRect(rectF);
-
-                        canMove=rectF.contains(event.getX(),event.getY());
-                    }else{
-                        canMove=barRectF.contains(event.getX(),event.getY());
-                    }
-                }
-
+                firstDownX=event.getX();
+                tempX=event.getX();
             break;
             case MotionEvent.ACTION_UP:
-                if(isEnabled()&&canMove){
-                    rectReset();
+                if(isEnabled()){
+                    //点击
+                    if(Math.abs(firstDownX-event.getX())<= ViewConfiguration.get(getContext()).getScaledTouchSlop()){
+                        if(onSwitchClickListener!=null&&onSwitchClickListener.onSwitchClick(isEnabled(),MySwitch.this)==true){
+
+                        }else{
+                            toggle();
+                        }
+                    }else{
+                        rectReset();
+                    }
                 }
-                canMove=false;
                 break;
+            case MotionEvent.ACTION_MOVE:
+                if(isEnabled()&&canMove){
+                    float distanceX=tempX-event.getX();
+                    if(Math.abs(firstDownX-event.getX())>ViewConfiguration.get(getContext()).getScaledTouchSlop()) {
+                        moveSwitchBar(distanceX);
+                    }
+                    tempX=event.getX();
+                }
+                break;
+
         }
         return true;
     }
-
+    //移动滑块
+    private void moveSwitchBar(float distanceX){
+        if(valueAnimator!=null&&valueAnimator.isRunning()){
+            valueAnimator.cancel();
+        }
+        if(reverse){
+            distanceX=distanceX*-1;
+        }
+        //从右往左移动
+        if(distanceX>0){
+            if (barRectF.left-borderWidth<distanceX) {
+                distanceX=barRectF.left-borderWidth;
+            }
+            barRectF.left=barRectF.left-distanceX;
+            barRectF.right=barRectF.right-distanceX;
+        }else{
+            if (barRectF.right+borderWidth+Math.abs(distanceX)>getWidth()) {
+                distanceX=getWidth()-barRectF.right-borderWidth;
+            }
+            barRectF.left=barRectF.left+Math.abs(distanceX);
+            barRectF.right=barRectF.right+Math.abs(distanceX);
+        }
+        float barHeight=getHeight()-borderWidth * 2f;
+        float moveLength = getWidth() -barHeight-borderWidth*2f;
+        if(!isChecked()){
+            float value = (barRectF.left-borderWidth)*1f / moveLength;
+            canvasColor= (int) argbEvaluator.evaluate(value,unCheckColor,checkColor);
+            canvasBarColor= (int) argbEvaluator.evaluate(value,unCheckBarColor,checkBarColor);
+            canvasBorderColor= (int) argbEvaluator.evaluate(value,unCheckBorderColor,checkBorderColor);
+        }else{
+            float value = (getWidth()-barRectF.right-borderWidth)*1f / moveLength;
+            canvasColor= (int) argbEvaluator.evaluate(value,checkColor,unCheckColor);
+            canvasBarColor= (int) argbEvaluator.evaluate(value,checkBarColor,unCheckBarColor);
+            canvasBorderColor= (int) argbEvaluator.evaluate(value,checkBorderColor,unCheckBorderColor);
+        }
+        initPath();
+        invalidate();
+    }
     //手动滑动滑块，ACTION_UP之后复位
     private void rectReset() {
         float barHeight=getHeight()-borderWidth * 2f;
         float moveLength = getWidth() -barHeight-borderWidth*2f;
         float value = (barRectF.left-borderWidth)*1f / moveLength;
-        if(value<=0.5f){
-            //复位
-            prepareAnimator(value,0);
+        if(isChecked()){
+            if(value<=0.5f){
+                checked=!checked;
+                if(onSwitchChangeListener!=null){
+                    onSwitchChangeListener.onSwitchChange(checked,MySwitch.this);
+                }
+                //改变状态
+                prepareAnimator(1-value,1);
+            }else{
+                //复位
+                prepareAnimator(value,1);
+            }
         }else{
-            checked=!checked;
-            prepareAnimator(value,1);
+            if(value<=0.5f){
+                //复位
+                prepareAnimator(1-value,1);
+            }else{
+                checked=!checked;
+                //改变状态
+                if(onSwitchChangeListener!=null){
+                    onSwitchChangeListener.onSwitchChange(checked,MySwitch.this);
+                }
+                prepareAnimator(value,1);
+            }
         }
+
         valueAnimator.setDuration((long) (duration*value));
         valueAnimator.start();
     }
@@ -452,6 +457,7 @@ public class MySwitch extends View implements Checkable{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.save();
         if(reverse){
             canvas.rotate(180,getWidth()/2,getHeight()/2);
         }
@@ -474,6 +480,7 @@ public class MySwitch extends View implements Checkable{
         /*滑块边框*/
         canvas.drawPath(barBorderPath,barBorderPaint);
 
+        canvas.restore();
     }
 
     @Override
@@ -721,6 +728,14 @@ public class MySwitch extends View implements Checkable{
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isCanMove() {
+        return canMove;
+    }
+
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
     }
 
     private void postRefresh(){
