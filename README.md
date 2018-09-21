@@ -29,7 +29,7 @@
 | reverse            | boolean   | View是否反向,true:右开左关,false:左开右关,默认值:false   |
 | enabled            | boolean   | 是否启用点击和滑动,默认值:true(为false时覆盖canMove属性) |
 | canMove            | boolean   | 是否可以滑动滑块,默认值:true                             |
-| checked            | boolean   | 默认值:true                                              |  
+| checked            | boolean   | 默认值:false                                              |
 
 
 ```xml

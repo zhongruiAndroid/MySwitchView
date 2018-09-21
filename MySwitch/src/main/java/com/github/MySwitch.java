@@ -101,7 +101,7 @@ public class MySwitch extends View implements Checkable{
     private float centerX;
     private float centerY;
 
-    private boolean checked=true;
+    private boolean checked;
 
 
     //滑块阴影颜色宽度
