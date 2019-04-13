@@ -109,13 +109,15 @@ ms.setOnSwitchClickListener(new MySwitch.OnSwitchClickListener() {
        return false;
    }
 });
-```  
+```
+
+### 如果本库对您有帮助,还希望支付宝扫一扫下面二维码,你我同时免费获取奖励金(非常感谢 Y(^-^)Y)
+![github](https://github.com/zhongruiAndroid/SomeImage/blob/master/image/small_ali.jpg?raw=true "github")  
+
   
   | 最新版本号 | [ ![Download](https://api.bintray.com/packages/zhongrui/mylibrary/MySwitch/images/download.svg) ](https://bintray.com/zhongrui/mylibrary/MySwitch/_latestVersion) |
 |--------|----|
   
-
-
 
 ```gradle
 implementation 'com.github:MySwitch:版本号看上面'
