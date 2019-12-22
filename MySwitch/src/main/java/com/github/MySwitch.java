@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -362,7 +363,9 @@ public class MySwitch extends View implements Checkable{
         }
         barBorderPath.addRoundRect(barRectF,barRadius,barRadius, Path.Direction.CW);
 
-        borderPath.op(checkColorPath,DIFFERENCE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            borderPath.op(checkColorPath,DIFFERENCE);
+        }
     }
     private float firstDownX;
     private float tempX;
@@ -505,7 +508,8 @@ public class MySwitch extends View implements Checkable{
     @Override
     public void setChecked(boolean checked) {
         if(checked!=isChecked()){
-            toggle();
+            //代码调用不使用动画
+            toggle(false);
         }
     }
     @Override
